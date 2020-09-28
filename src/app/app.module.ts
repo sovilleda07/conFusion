@@ -14,10 +14,11 @@ import { AppComponent } from './app.component';
 // 2. Importar Hammer
 import 'hammerjs';
 import { MenuComponent } from './menu/menu.component';
+import { DishdetailComponent } from './dishdetail/dishdetail.component';
 
 // 3. Importar módulos en decorador
 @NgModule({
-  declarations: [AppComponent, MenuComponent],
+  declarations: [AppComponent, MenuComponent, DishdetailComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
