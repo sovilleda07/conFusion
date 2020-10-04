@@ -16,6 +16,9 @@ import 'hammerjs';
 import { MenuComponent } from './menu/menu.component';
 import { DishdetailComponent } from './dishdetail/dishdetail.component';
 
+// 4. Importar Servicio
+import { DishService } from './services/dish.service';
+
 // 3. Importar módulos en decorador
 @NgModule({
   declarations: [AppComponent, MenuComponent, DishdetailComponent],
@@ -29,7 +32,7 @@ import { DishdetailComponent } from './dishdetail/dishdetail.component';
     MatButtonModule,
     FlexLayoutModule,
   ],
-  providers: [],
+  providers: [DishService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

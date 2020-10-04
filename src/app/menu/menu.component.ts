@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Dish } from '../shared/dish';
-// 1. Eliminar constante DISHES e importar desde el archivo dishes.ts
-import { DISHES } from '../shared/dishes';
+// 1. Eliminar importación directa e importar el servicio
+import { DishService } from '../services/dish.service';
 
 @Component({
   selector: 'app-menu',
@@ -9,16 +9,24 @@ import { DISHES } from '../shared/dishes';
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
-  dishes: Dish[] = DISHES;
+  dishes: Dish[];
 
-  // 2. No iniciarlizar la variable (quitar valor)
   selectedDish: Dish;
-  constructor() {}
+  // 2. Habilitar en el constructor el servicio
+  // Cuando se crea este componente, se inyecta el DishService en el módulo
+  // de la aplicación, se creará un solo objeto DishService que estará
+  // disponible dentro de su componente
+  constructor(private dishService: DishService) {}
 
-  ngOnInit(): void {}
+  // 3. Utilizar el evento On Init para hacer uso del servicio
+  // y almacenar la información en la variable "dishes"
+  // todo cuando se cree una instancia del componente
+  // tslint:disable-next-line: typedef
+  ngOnInit() {
+    // Utilizamos el método para obtener el JSON con la información
+    this.dishes = this.dishService.getDishes();
+  }
 
-  // 3. Llamar evento "onSelect" y asignar el valor enviado
-  // a la variable "selectedDish"
   // tslint:disable-next-line: typedef
   onSelect(dish: Dish) {
     this.selectedDish = dish;
