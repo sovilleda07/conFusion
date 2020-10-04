@@ -18,10 +18,12 @@ import { DishdetailComponent } from './dishdetail/dishdetail.component';
 
 // 4. Importar Servicio
 import { DishService } from './services/dish.service';
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
 
 // 3. Importar módulos en decorador
 @NgModule({
-  declarations: [AppComponent, MenuComponent, DishdetailComponent],
+  declarations: [AppComponent, MenuComponent, DishdetailComponent, HeaderComponent, FooterComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
