@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-// 1. Importar Dish
 import { Dish } from '../shared/dish';
-// 2. Impotar DISHES
 import { DISHES } from '../shared/dishes';
 
 @Injectable({
@@ -10,8 +8,20 @@ import { DISHES } from '../shared/dishes';
 export class DishService {
   constructor() {}
 
-  // 3. Crear método que devulve la matriz de DIHES
+  // Método para obtener todos los platillos
   getDishes(): Dish[] {
     return DISHES;
+  }
+
+  // 1. Crear nuevos métodos
+
+  // Método para obtener un platillo por su ID
+  getDish(id: string): Dish {
+    return DISHES.filter((dish) => dish.id === id)[0];
+  }
+
+  // Método para establecer un platillo como destacado
+  getFeaturedDish(): Dish {
+    return DISHES.filter((dish) => dish.featured)[0];
   }
 }

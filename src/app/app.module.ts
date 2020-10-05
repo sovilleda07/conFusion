@@ -23,9 +23,11 @@ import { ContactComponent } from './contact/contact.component';
 
 // 4. Importar Servicio
 import { DishService } from './services/dish.service';
+import { PromotionService } from './services/promotion.service';
 
 // 5. Importar Router
 import { AppRoutingModule } from './app-routing/app-routing.module';
+
 // 3. Importar módulos en decorador
 @NgModule({
   // tslint:disable-next-line: max-line-length
@@ -51,7 +53,7 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
     FlexLayoutModule,
     AppRoutingModule,
   ],
-  providers: [DishService],
+  providers: [DishService, PromotionService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
