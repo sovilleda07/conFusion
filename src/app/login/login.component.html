@@ -6,14 +6,20 @@
 
 <p>{{ user | json }}</p>
 
-<form novalidate (ngSubmit)="onSubmit()">
+<!-- 1. Agregar la varianle de plantilla "LoginForm" -->
+<!-- La variable de plantilla nos permite rastrear el estado del formulario -->
+<form novalidate #loginForm="ngForm" (ngSubmit)="onSubmit()">
     <mat-dialog-content>
         <p>
+            <!-- 2. A cada campo agregar la variable de plantilla (ngModel y required) -->
+            <!-- 4. Agregar la etiqueta <mat-error> a cada campo para mostrar un msj de error -->
             <mat-form-field>
-                <input matInput placeholder="Username" type="text" [(ngModel)]="user.username" name="username" />
+                <input matInput placeholder="Username" type="text" [(ngModel)]="user.username" name="username" #username="ngModel" required />
+                <mat-error *ngIf="username.errors?.required">Username is required</mat-error>
             </mat-form-field>
             <mat-form-field>
-                <input matInput placeholder="Password" type="password" [(ngModel)]="user.password" name="password" />
+                <input matInput placeholder="Password" type="password" [(ngModel)]="user.password" name="password" #password="ngModel" required />
+                <mat-error *ngIf="password.errors?.required">Password is required</mat-error>
             </mat-form-field>
             <mat-checkbox [(ngModel)]="user.remember" name="remember">Remember me</mat-checkbox>
         </p>
@@ -21,6 +27,7 @@
     <mat-dialog-actions>
         <span class="flex-spacer"></span>
         <button mat-button mat-dialog-close>Cancel</button>
-        <button mat-button type="submit" class="background-primary text-floral-white">Login</button>
+        <!-- 3. Validación de deshabilitar el botón si el formulario es inválido -->
+        <button mat-button type="submit" class="background-primary text-floral-white" [disabled]="loginForm.form.invalid">Login</button>
     </mat-dialog-actions>
 </form>
