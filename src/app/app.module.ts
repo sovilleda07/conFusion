@@ -6,9 +6,19 @@ import { MatListModule } from '@angular/material/list';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-// 1. Importar para el uso de diálogos
 import { MatDialogModule } from '@angular/material/dialog';
+
+// 1. Importar elementos para Formulario
+// - Permite agrupar un montón de elementos en un campo de formulario
+import { MatFormFieldModule } from '@angular/material/form-field';
+// - Adminte el componente de entrada que es un componente estilizado de Angular Material
+// que admite el campo de formulario de entrada de formularios HTMl aquí.
+import { MatInputModule } from '@angular/material/input';
+// - Módulo de la casilla de verificación AM
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FlexLayoutModule } from '@angular/flex-layout';
+// - Formularios de AM, que admite formas controladas por plantillas
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 
@@ -28,6 +38,7 @@ import { LeaderService } from './services/leader.service';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LoginComponent } from './login/login.component';
 
+// 2. Incluir importaciones
 @NgModule({
   // tslint:disable-next-line: max-line-length
   // tslint:disable-next-line: no-trailing-whitespace
@@ -51,15 +62,15 @@ import { LoginComponent } from './login/login.component';
     MatCardModule,
     MatButtonModule,
     MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
     FlexLayoutModule,
+    FormsModule,
     AppRoutingModule,
   ],
   providers: [DishService, PromotionService, LeaderService],
-  // 2. Indicar que componente son de entrada, para usar el LoginComponent como una
-  // superposición en la parte superior de la pantalla actual.
-  entryComponents: [
-    LoginComponent
-  ],
+  entryComponents: [LoginComponent],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
