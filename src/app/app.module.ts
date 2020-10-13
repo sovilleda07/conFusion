@@ -7,19 +7,18 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-
-// 1. Importar elementos para Formulario
-// - Permite agrupar un montón de elementos en un campo de formulario
 import { MatFormFieldModule } from '@angular/material/form-field';
-// - Adminte el componente de entrada que es un componente estilizado de Angular Material
-// que admite el campo de formulario de entrada de formularios HTMl aquí.
 import { MatInputModule } from '@angular/material/input';
-// - Módulo de la casilla de verificación AM
 import { MatCheckboxModule } from '@angular/material/checkbox';
+// 1. Importar
+// - Utilizar el elemento Select
+import { MatSelectModule } from '@angular/material/select';
+// - Utilizar el botón Slide en el formulario
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FlexLayoutModule } from '@angular/flex-layout';
-// - Formularios de AM, que admite formas controladas por plantillas
 import { FormsModule } from '@angular/forms';
-
+// - Reactive Forms
+import { ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 
 import 'hammerjs';
@@ -38,7 +37,7 @@ import { LeaderService } from './services/leader.service';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LoginComponent } from './login/login.component';
 
-// 2. Incluir importaciones
+// 2. Incluir en el decorador
 @NgModule({
   // tslint:disable-next-line: max-line-length
   // tslint:disable-next-line: no-trailing-whitespace
@@ -65,8 +64,11 @@ import { LoginComponent } from './login/login.component';
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
+    MatSelectModule,
+    MatSlideToggleModule,
     FlexLayoutModule,
     FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
   ],
   providers: [DishService, PromotionService, LeaderService],
