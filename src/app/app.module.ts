@@ -10,14 +10,12 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-// 1. Importar
-// - Utilizar el elemento Select
 import { MatSelectModule } from '@angular/material/select';
-// - Utilizar el botón Slide en el formulario
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+// 1. Importar "Progress Spinner"
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule } from '@angular/forms';
-// - Reactive Forms
 import { ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 
@@ -37,7 +35,6 @@ import { LeaderService } from './services/leader.service';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LoginComponent } from './login/login.component';
 
-// 2. Incluir en el decorador
 @NgModule({
   // tslint:disable-next-line: max-line-length
   // tslint:disable-next-line: no-trailing-whitespace
@@ -66,6 +63,7 @@ import { LoginComponent } from './login/login.component';
     MatCheckboxModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatProgressSpinnerModule,
     FlexLayoutModule,
     FormsModule,
     ReactiveFormsModule,
