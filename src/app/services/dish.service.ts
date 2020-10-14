@@ -8,20 +8,16 @@ import { DISHES } from '../shared/dishes';
 export class DishService {
   constructor() {}
 
-  // Método para obtener todos los platillos
-  getDishes(): Dish[] {
-    return DISHES;
+  // 1. Crear promesa en este servicio
+  getDishes(): Promise<Dish[]> {
+    return Promise.resolve(DISHES);
   }
 
-  // 1. Crear nuevos métodos
-
-  // Método para obtener un platillo por su ID
-  getDish(id: string): Dish {
-    return DISHES.filter((dish) => dish.id === id)[0];
+  getDish(id: string): Promise<Dish> {
+    return Promise.resolve(DISHES.filter((dish) => dish.id === id)[0]);
   }
 
-  // Método para establecer un platillo como destacado
-  getFeaturedDish(): Dish {
-    return DISHES.filter((dish) => dish.featured)[0];
+  getFeaturedDish(): Promise<Dish> {
+    return Promise.resolve(DISHES.filter((dish) => dish.featured)[0]);
   }
 }
