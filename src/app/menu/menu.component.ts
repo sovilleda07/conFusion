@@ -12,10 +12,12 @@ export class MenuComponent implements OnInit {
 
   selectedDish: Dish;
   constructor(private dishService: DishService) {}
+  // 1. Cambiar .then por .subscribe (porque no retornamos promesa
+  // desde el servicio).
   // tslint:disable-next-line: typedef
   ngOnInit() {
     this.dishService.getDishes()
-    .then((dishes) => this.dishes = dishes);
+    .subscribe((dishes) => this.dishes = dishes);
   }
 
   // tslint:disable-next-line: typedef
