@@ -1,5 +1,3 @@
-// 3. Importar "ViewChild" para restablecer form de la plantilla
-// Permitirá obtener acceso a cualquier elemento del DOM de la plantilla.
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
@@ -13,10 +11,43 @@ export class ContactComponent implements OnInit {
   feedbackForm: FormGroup;
   feedback: Feedback;
   contactType = ContactType;
-  // 4. Utilizar "@ViewChild" para hacer referencia al FeedbackForm
-  // dándole una variable de plantilla con el nombre "fform"
-  // Esto nos permite obtener acceso al formulario de plantilla para luego restablecerlo
   @ViewChild('fform') feedbackFormDirective;
+
+  // 4. Definir objeto con campos que tienen validaciones.
+  // Si se detecta algún error, una cadena que contiene el mensaje correspondiente a ese error
+  // se agregará a este objeto.
+  formErrors = {
+    // tslint:disable-next-line: object-literal-key-quotes
+    'firstname': '',
+    // tslint:disable-next-line: object-literal-key-quotes
+    'lastname': '',
+    // tslint:disable-next-line: object-literal-key-quotes
+    'telnum': '',
+    // tslint:disable-next-line: object-literal-key-quotes
+    'email': ''
+  };
+
+  // 5. Definir objeto con mensajes de error
+  validationMessages = {
+    firstname: {
+      required:      'First Name is required.',
+      minlength:     'First Name must be at least 2 characters long.',
+      maxlength:     'FirstName cannot be more than 25 characters long.'
+    },
+    lastname: {
+      required:      'Last Name is required.',
+      minlength:     'Last Name must be at least 2 characters long.',
+      maxlength:     'Last Name cannot be more than 25 characters long.'
+    },
+    telnum: {
+      required:      'Tel. number is required.',
+      pattern:       'Tel. number must contain only numbers.'
+    },
+    email: {
+      required:      'Email is required.',
+      email:         'Email not in valid format.'
+    },
+  };
 
   constructor(private fb: FormBuilder) {
     this.createForm();
@@ -24,24 +55,90 @@ export class ContactComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  // 1. Agregar más validaciones
+  // Cuando es "Validators.patter" se agrega en el elemento un atributo con el patrón.
   createForm(): void {
-    // 1. Agregar validaciones
     this.feedbackForm = this.fb.group({
-      firstname: ['', Validators.required],
-      lastname: ['', Validators.required],
-      telnum: [0, Validators.required],
-      email: ['', Validators.required],
+      firstname: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(25),
+        ],
+      ],
+      lastname: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(25),
+        ],
+      ],
+      telnum: [0, [Validators.required, Validators.pattern]],
+      email: ['', [Validators.required, Validators.pattern]],
       agree: false,
       contacttype: 'None',
       message: '',
     });
+
+    // 2. Cuando el Formulario experimenta cambios en cualquiera de sus elementos
+    // Angular Framework proporciona un Observable llamado "ValueChanges"
+    // Lo utilizaremos en el formulario de Comentarios
+    // ahora se puede suscribir dentro de este método en particular.
+
+    // Dentro de la suscripción se especificará lo que se debe hacer cuando los "ValueChanges"
+    // Se obtendrán algunos datos de la granja, para indicar que elemento de forma particular
+    // ha experimentado el cambio en el valor.
+    // Luego de eso, se activará un método local "onValueChanged" y luego se suministrará esos
+    // datos como un parámetro para este método.
+    this.feedbackForm.valueChanges
+    .subscribe(data => this.onValueChanged(data));
+
+    // Dentro del evento se iniciará la validación del formulario y definir adecuadamente los
+    // mensajes de error del formulario, en función del objeto (data).
+
+    // 3. Llamar al método "onValueChanged" sin parámetro para restablecer los mensajes de validación.
+    this.onValueChanged();  // (re) set form validation messages
+  }
+
+  // 6. Método "onValueChanged"
+  onValueChanged(data?: any): void {
+    // Si feedbackForm no ha sido creado
+    if (!this.feedbackForm) { return; }
+    // Definir constante
+    const form = this.feedbackForm;
+    // Este campo tomará el objeto (formErrors) y comprobar los 4
+    // Así que detecta cualquier cambio
+    // Si se llama al método sin parámetro, se borrarán todos los campos de "formErrors"
+    for (const field in this.formErrors) {
+      // En caso de que haya adjuntado algún msj a estos campos
+      // de formulario, se borrarán todos.
+      if (this.formErrors.hasOwnProperty(field)) {
+        // clear previous error message (if any)
+        this.formErrors[field] = '';
+        // Obtener acceso a ese campo de formulario en particular
+        const control = form.get(field);
+        // Para cada uno de los campos se valida si no es nulo, ya está sucio y no válido
+        if (control && control.dirty && !control.valid) {
+        // Verifcar qué tipo de errores se han agregado a ese control.
+        // Estamos recogiendo todos los mensajes de validación correspondientes a ese campo.
+        // Luego verificaré, y veré su necesito agregar esto al campo.
+          const messages = this.validationMessages[field];
+          for (const key in control.errors) {
+            // Si hay algún error, agregaré este campo de formErrors
+            if (control.errors.hasOwnProperty(key)) {
+              this.formErrors[field] += messages[key] + ' ';
+            }
+          }
+        }
+      }
+    }
   }
 
   onSubmit(): void {
     this.feedback = this.feedbackForm.value;
     console.log(this.feedback);
-    // 2. Al momento de hacer reset, que regrese a los valores iniciales
-    // Y luego restablecer en la plantilla el formulario también.
     this.feedbackForm.reset({
       firtsname: '',
       lastname: '',
@@ -51,7 +148,6 @@ export class ContactComponent implements OnInit {
       contacttype: 'None',
       message: '',
     });
-    // 5. Restablecer completamente el formulario por medio de la asignación de "@ViewChild"
     this.feedbackFormDirective.resetForm();
   }
 }
