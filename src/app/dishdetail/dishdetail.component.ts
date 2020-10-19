@@ -3,8 +3,9 @@ import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Dish } from '../shared/dish';
 import { DishService } from '../services/dish.service';
-// 3. Importar "SwitchMap"
 import { switchMap } from 'rxjs/operators';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Comment } from '../shared/comment';
 
 @Component({
   selector: 'app-dishdetail',
@@ -13,33 +14,44 @@ import { switchMap } from 'rxjs/operators';
 })
 export class DishdetailComponent implements OnInit {
   dish: Dish;
-  // 1. Declarar variable para almacenar los ID's de los platos
   dishIds: string[];
   prev: string;
   next: string;
 
+  // --------- Tarea ----------
+  commentForm: FormGroup;
+  comment: Comment;
+
+  formErrors = {
+    author: '',
+    rating: 5,
+    comment: ''
+  };
+
+  validationMessages = {
+    author: {
+      required:      'Author is required',
+      minlength:     'Author must be at least 2 character long.'
+    },
+    comment: {
+      required:      'Comment is required.',
+      minlength:     'Comment must be at least 1 characters long.'
+    }
+  };
+
   constructor(
     private dishService: DishService,
     private route: ActivatedRoute,
-    private location: Location
-  ) {}
+    private location: Location,
+    private fb: FormBuilder
+  ) {
+    this.createForm();
+  }
 
-  // 2. Cambios para obtener el parámetro del URL
   ngOnInit(): void {
-    // 2.2
-    // Obtener todos los ids de los platos
     this.dishService
       .getDishIds()
       .subscribe((dishIds) => (this.dishIds = dishIds));
-
-    // 2.1
-    // Tener acceso a los parámetros observables
-    // De los parámetros observables obtenemos parámetros que son del tipo Params
-    // Por lo tanto, importamos la biblioteca del enrutador.
-    // Somos capaces de hacer este parámetro de ruta para obtener los parámetros observables
-    // Se utiliza "SwitchMap" en los parámetros observables
-    // Y luego cuando se obtienen los parámetros observables, los tomamos
-    // Y luego llamamos al método.
     this.route.params
       .pipe(
         // tslint:disable-next-line: no-string-literal
@@ -50,18 +62,66 @@ export class DishdetailComponent implements OnInit {
         this.setPrevNext(dish.id);
       });
 
-    // Cada vez que los parámetros observables cambian el valor, lo que significa que el
-    // parámetro de ruta cambia el valor, inmediatamente el operador "SwitchMap" tomará
-    // el valor de parámetros, luego hará un "GetDish" desde mi "DishService".
-
-    // Por lo tanto, estamos creando un nuevo observable que es GetDish, que va
-    // a devolver el objeto plato aquí.
-    // Una vez teniendo "GetDish", eso ahora puede estar disponible como observable.
-    // También se susccribe a ese observable, entonces allí se obtiene el plato.
-    // Así que de esta manera, "dish" ahora se actualiza.
   }
 
-  // 2.3 Creación de métodos para navegar entre los platillo
+  createForm(): void {
+    this.commentForm = this.fb.group({
+      author: [
+        '',
+        [Validators.required,
+          Validators.minLength(2),
+        ],
+      ],
+      rating: 5,
+      comment: [
+        '',
+        [Validators.required,
+          Validators.minLength(1),
+        ],
+      ],
+    });
+
+    this.commentForm.valueChanges
+    .subscribe(data => this.onValueChanged(data));
+
+    this.onValueChanged();
+  }
+
+  onValueChanged(data?: any): void {
+    if (!this.commentForm) { return; }
+    const form = this.commentForm;
+    for (const field in this.formErrors) {
+      if (this.formErrors.hasOwnProperty(field)) {
+        this.formErrors[field] = '';
+        const control = form.get(field);
+        if (control && control.dirty && !control.valid) {
+          const messages = this.validationMessages[field];
+          for (const key in control.errors) {
+            if (control.errors.hasOwnProperty(key)) {
+              this.formErrors[field] += messages[key] + ' ';
+            }
+          }
+        }
+      }
+    }
+  }
+
+  onSubmit(): void {
+    this.comment = this.commentForm.value;
+    this.comment.date = new Date().toISOString();
+    this.dish.comments.push(this.comment);
+    this.commentForm.reset({
+      author: '' ,
+      rating: 5 ,
+      comment: ''
+    });
+  }
+
+  // tslint:disable-next-line: typedef
+  formatLabel(value: number) {
+    return value;
+  }
+
   setPrevNext(dishId: string): void {
     const index = this.dishIds.indexOf(dishId);
     this.prev = this.dishIds[
