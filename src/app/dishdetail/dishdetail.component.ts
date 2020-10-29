@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Dish } from '../shared/dish';
@@ -25,25 +25,26 @@ export class DishdetailComponent implements OnInit {
   formErrors = {
     author: '',
     rating: 5,
-    comment: ''
+    comment: '',
   };
 
   validationMessages = {
     author: {
-      required:      'Author is required',
-      minlength:     'Author must be at least 2 character long.'
+      required: 'Author is required',
+      minlength: 'Author must be at least 2 character long.',
     },
     comment: {
-      required:      'Comment is required.',
-      minlength:     'Comment must be at least 1 characters long.'
-    }
+      required: 'Comment is required.',
+      minlength: 'Comment must be at least 1 characters long.',
+    },
   };
 
   constructor(
     private dishService: DishService,
     private route: ActivatedRoute,
     private location: Location,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    @Inject('BaseURL') public BaseURL
   ) {
     this.createForm();
   }
@@ -61,34 +62,26 @@ export class DishdetailComponent implements OnInit {
         this.dish = dish;
         this.setPrevNext(dish.id);
       });
-
   }
 
   createForm(): void {
     this.commentForm = this.fb.group({
-      author: [
-        '',
-        [Validators.required,
-          Validators.minLength(2),
-        ],
-      ],
+      author: ['', [Validators.required, Validators.minLength(2)]],
       rating: 5,
-      comment: [
-        '',
-        [Validators.required,
-          Validators.minLength(1),
-        ],
-      ],
+      comment: ['', [Validators.required, Validators.minLength(1)]],
     });
 
-    this.commentForm.valueChanges
-    .subscribe(data => this.onValueChanged(data));
+    this.commentForm.valueChanges.subscribe((data) =>
+      this.onValueChanged(data)
+    );
 
     this.onValueChanged();
   }
 
   onValueChanged(data?: any): void {
-    if (!this.commentForm) { return; }
+    if (!this.commentForm) {
+      return;
+    }
     const form = this.commentForm;
     for (const field in this.formErrors) {
       if (this.formErrors.hasOwnProperty(field)) {
@@ -111,9 +104,9 @@ export class DishdetailComponent implements OnInit {
     this.comment.date = new Date().toISOString();
     this.dish.comments.push(this.comment);
     this.commentForm.reset({
-      author: '' ,
-      rating: 5 ,
-      comment: ''
+      author: '',
+      rating: 5,
+      comment: '',
     });
   }
 

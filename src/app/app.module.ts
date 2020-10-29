@@ -17,6 +17,9 @@ import { MatSliderModule } from '@angular/material/slider';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+// 1.Importar Nódulo HTTP
+import { HttpClientModule } from '@angular/common/http';
+
 import { AppComponent } from './app.component';
 
 import 'hammerjs';
@@ -34,6 +37,9 @@ import { LeaderService } from './services/leader.service';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LoginComponent } from './login/login.component';
+
+// 2. Importar el baserul
+import { baseURL } from './shared/baseurl';
 
 @NgModule({
   // tslint:disable-next-line: max-line-length
@@ -68,9 +74,16 @@ import { LoginComponent } from './login/login.component';
     FlexLayoutModule,
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [DishService, PromotionService, LeaderService],
+  // 3. Incorporar como proveedor el baseurl
+  providers: [
+    DishService,
+    PromotionService,
+    LeaderService,
+    { provide: 'BaseURL', useValue: baseURL },
+  ],
   entryComponents: [LoginComponent],
   bootstrap: [AppComponent],
 })

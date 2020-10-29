@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Dish } from '../shared/dish';
 import { DishService } from '../services/dish.service';
 
@@ -10,18 +10,14 @@ import { DishService } from '../services/dish.service';
 export class MenuComponent implements OnInit {
   dishes: Dish[];
 
-  selectedDish: Dish;
-  constructor(private dishService: DishService) {}
-  // 1. Cambiar .then por .subscribe (porque no retornamos promesa
-  // desde el servicio).
+  // 1. Inyectar el BaseURL
+  constructor(private dishService: DishService,
+              @Inject('BaseURL') public BaseURL) {}
+
   // tslint:disable-next-line: typedef
   ngOnInit() {
     this.dishService.getDishes()
     .subscribe((dishes) => this.dishes = dishes);
   }
 
-  // tslint:disable-next-line: typedef
-  onSelect(dish: Dish) {
-    this.selectedDish = dish;
-  }
 }
