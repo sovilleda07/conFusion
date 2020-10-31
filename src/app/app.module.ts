@@ -17,7 +17,6 @@ import { MatSliderModule } from '@angular/material/slider';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-// 1.Importar Nódulo HTTP
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
@@ -34,11 +33,12 @@ import { ContactComponent } from './contact/contact.component';
 import { DishService } from './services/dish.service';
 import { PromotionService } from './services/promotion.service';
 import { LeaderService } from './services/leader.service';
+// 1. Importar servicio
+import { ProcessHttpMsgService } from './services/process-http-msg.service';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LoginComponent } from './login/login.component';
 
-// 2. Importar el baserul
 import { baseURL } from './shared/baseurl';
 
 @NgModule({
@@ -77,11 +77,12 @@ import { baseURL } from './shared/baseurl';
     HttpClientModule,
     AppRoutingModule,
   ],
-  // 3. Incorporar como proveedor el baseurl
+  // 2. Añadir el servicio al proveedor
   providers: [
     DishService,
     PromotionService,
     LeaderService,
+    ProcessHttpMsgService,
     { provide: 'BaseURL', useValue: baseURL },
   ],
   entryComponents: [LoginComponent],

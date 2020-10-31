@@ -16,9 +16,14 @@
             </mat-grid-tile>
         </mat-grid-list>
     </div>
-    <!-- 1. Crear div oculto para mostrar cuando "dishes" no existe -->
-    <div fxFlex [hidden]="dishes">
+    <!-- 1. Si la variable "errMess" es no nula, entonces que salga el spinner -->
+    <div fxFlex [hidden]="dishes || errMess">
         <mat-spinner></mat-spinner>
         <h4>Loading . . . Please Wait</h4>
+    </div>
+    <!-- 2. Div para el mensaje de error, en caso de que exista -->
+    <div fxFlex *ngIf="errMess">
+        <h2>Error</h2>
+        <h4>{{ errMess }}</h4>
     </div>
 </div>

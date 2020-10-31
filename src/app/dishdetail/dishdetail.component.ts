@@ -14,11 +14,11 @@ import { Comment } from '../shared/comment';
 })
 export class DishdetailComponent implements OnInit {
   dish: Dish;
+  errMess: string;
   dishIds: string[];
   prev: string;
   next: string;
 
-  // --------- Tarea ----------
   commentForm: FormGroup;
   comment: Comment;
 
@@ -45,11 +45,10 @@ export class DishdetailComponent implements OnInit {
     private location: Location,
     private fb: FormBuilder,
     @Inject('BaseURL') public BaseURL
-  ) {
-    this.createForm();
-  }
+  ) {}
 
   ngOnInit(): void {
+    this.createForm();
     this.dishService
       .getDishIds()
       .subscribe((dishIds) => (this.dishIds = dishIds));
@@ -61,7 +60,9 @@ export class DishdetailComponent implements OnInit {
       .subscribe((dish) => {
         this.dish = dish;
         this.setPrevNext(dish.id);
-      });
+      },
+      // tslint:disable-next-line: no-angle-bracket-type-assertion
+      errmess => this.errMess = <any> errmess);
   }
 
   createForm(): void {
