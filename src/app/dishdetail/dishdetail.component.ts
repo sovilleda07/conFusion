@@ -21,6 +21,8 @@ export class DishdetailComponent implements OnInit {
 
   commentForm: FormGroup;
   comment: Comment;
+  // 1. Nueva variable que contiene la copia del Dish modificado hasta que se publique en el servidor.
+  dishcopy: Dish;
 
   formErrors = {
     author: '',
@@ -57,12 +59,16 @@ export class DishdetailComponent implements OnInit {
         // tslint:disable-next-line: no-string-literal
         switchMap((params: Params) => this.dishService.getDish(params['id']))
       )
-      .subscribe((dish) => {
-        this.dish = dish;
-        this.setPrevNext(dish.id);
-      },
-      // tslint:disable-next-line: no-angle-bracket-type-assertion
-      errmess => this.errMess = <any> errmess);
+      .subscribe(
+        (dish) => {
+          this.dish = dish;
+          // 2. Creamos la copia del platillo
+          this.dishcopy = dish;
+          this.setPrevNext(dish.id);
+        },
+        // tslint:disable-next-line: no-angle-bracket-type-assertion
+        (errmess) => (this.errMess = <any> errmess)
+      );
   }
 
   createForm(): void {
@@ -103,7 +109,27 @@ export class DishdetailComponent implements OnInit {
   onSubmit(): void {
     this.comment = this.commentForm.value;
     this.comment.date = new Date().toISOString();
-    this.dish.comments.push(this.comment);
+    // 3. Empujaremos el comentario a la copia de dish.
+    // Para primero modificar el objeto DishCopy, y luego publicar eso en el servidor.
+    // Cuando el servidor responda con la información del plato modificada, entonces se mostrará en el cliente.
+    // Llamamos al método envíandole "dishcopy", la versión modificada
+    // Cuando recibamos la respuesta del servidor, manejaremos el plato entrante
+    this.dishcopy.comments.push(this.comment);
+    this.dishService.putDish(this.dishcopy).subscribe(
+      (dish) => {
+        // Igualamos el platillo actual al que viene del servidor.
+        this.dish = dish;
+        this.dishcopy = dish;
+      },
+      (errmess) => {
+        // Si hay algún problema, las variables que almacenan los platillo convertimos su valor a null
+        this.dish = null;
+        this.dishcopy = null;
+        // tslint:disable-next-line: no-angle-bracket-type-assertion
+        this.errMess = <any> errmess;
+      }
+    );
+    // this.commentFormDirective.resetForm();
     this.commentForm.reset({
       author: '',
       rating: 5,
