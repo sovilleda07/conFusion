@@ -1,22 +1,26 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
-import { flyInOut } from '../animations/app.animation';
-
+import { flyInOut, expand } from '../animations/app.animation';
+import { FeedbackService } from '../services/feedback.service';
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss'],
   host: {
     '[@flyInOut]': 'true',
-    'style': 'display: block;',
+    style: 'display: block;',
   },
-  animations: [flyInOut()],
+  animations: [flyInOut(), expand()],
 })
 export class ContactComponent implements OnInit {
   feedbackForm: FormGroup;
   feedback: Feedback;
   contactType = ContactType;
+  errMess: string;
+  submittingFeedback: boolean;
+  hideForm = false;
+
   @ViewChild('fform') feedbackFormDirective;
 
   // 4. Definir objeto con campos que tienen validaciones.
@@ -24,38 +28,41 @@ export class ContactComponent implements OnInit {
   // se agregará a este objeto.
   formErrors = {
     // tslint:disable-next-line: object-literal-key-quotes
-    'firstname': '',
+    firstname: '',
     // tslint:disable-next-line: object-literal-key-quotes
-    'lastname': '',
+    lastname: '',
     // tslint:disable-next-line: object-literal-key-quotes
-    'telnum': '',
+    telnum: '',
     // tslint:disable-next-line: object-literal-key-quotes
-    'email': ''
+    email: '',
   };
 
   // 5. Definir objeto con mensajes de error
   validationMessages = {
     firstname: {
-      required:      'First Name is required.',
-      minlength:     'First Name must be at least 2 characters long.',
-      maxlength:     'FirstName cannot be more than 25 characters long.'
+      required: 'First Name is required.',
+      minlength: 'First Name must be at least 2 characters long.',
+      maxlength: 'FirstName cannot be more than 25 characters long.',
     },
     lastname: {
-      required:      'Last Name is required.',
-      minlength:     'Last Name must be at least 2 characters long.',
-      maxlength:     'Last Name cannot be more than 25 characters long.'
+      required: 'Last Name is required.',
+      minlength: 'Last Name must be at least 2 characters long.',
+      maxlength: 'Last Name cannot be more than 25 characters long.',
     },
     telnum: {
-      required:      'Tel. number is required.',
-      pattern:       'Tel. number must contain only numbers.'
+      required: 'Tel. number is required.',
+      pattern: 'Tel. number must contain only numbers.',
     },
     email: {
-      required:      'Email is required.',
-      email:         'Email not in valid format.'
+      required: 'Email is required.',
+      email: 'Email not in valid format.',
     },
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private feedbackService: FeedbackService,
+    private fb: FormBuilder
+  ) {
     this.createForm();
   }
 
@@ -98,20 +105,23 @@ export class ContactComponent implements OnInit {
     // ha experimentado el cambio en el valor.
     // Luego de eso, se activará un método local "onValueChanged" y luego se suministrará esos
     // datos como un parámetro para este método.
-    this.feedbackForm.valueChanges
-    .subscribe(data => this.onValueChanged(data));
+    this.feedbackForm.valueChanges.subscribe((data) =>
+      this.onValueChanged(data)
+    );
 
     // Dentro del evento se iniciará la validación del formulario y definir adecuadamente los
     // mensajes de error del formulario, en función del objeto (data).
 
     // 3. Llamar al método "onValueChanged" sin parámetro para restablecer los mensajes de validación.
-    this.onValueChanged();  // (re) set form validation messages
+    this.onValueChanged(); // (re) set form validation messages
   }
 
   // 6. Método "onValueChanged"
   onValueChanged(data?: any): void {
     // Si feedbackForm no ha sido creado
-    if (!this.feedbackForm) { return; }
+    if (!this.feedbackForm) {
+      return;
+    }
     // Definir constante
     const form = this.feedbackForm;
     // Este campo tomará el objeto (formErrors) y comprobar los 4
@@ -127,9 +137,9 @@ export class ContactComponent implements OnInit {
         const control = form.get(field);
         // Para cada uno de los campos se valida si no es nulo, ya está sucio y no válido
         if (control && control.dirty && !control.valid) {
-        // Verifcar qué tipo de errores se han agregado a ese control.
-        // Estamos recogiendo todos los mensajes de validación correspondientes a ese campo.
-        // Luego verificaré, y veré su necesito agregar esto al campo.
+          // Verifcar qué tipo de errores se han agregado a ese control.
+          // Estamos recogiendo todos los mensajes de validación correspondientes a ese campo.
+          // Luego verificaré, y veré su necesito agregar esto al campo.
           const messages = this.validationMessages[field];
           for (const key in control.errors) {
             // Si hay algún error, agregaré este campo de formErrors
@@ -143,17 +153,38 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.hideForm = true;
+
     this.feedback = this.feedbackForm.value;
     console.log(this.feedback);
-    this.feedbackForm.reset({
-      firtsname: '',
-      lastname: '',
-      telnum: 0,
-      email: '',
-      agree: false,
-      contacttype: 'None',
-      message: '',
-    });
-    this.feedbackFormDirective.resetForm();
+    this.feedbackService.submitFeedback(this.feedback).subscribe(
+      (feedb) => {
+        this.feedback = feedb;
+        const that = this;
+
+        // tslint:disable-next-line: only-arrow-functions
+        setTimeout(function(): void {
+          that.hideForm = false;
+          that.feedback = null;
+
+          that.feedbackForm.reset({
+            firstname: '',
+            lastname: '',
+            telnum: 0,
+            email: '',
+            agree: false,
+            contacttype: 'None',
+            message: '',
+          });
+
+          that.feedbackFormDirective.resetForm();
+        }, 5000);
+      },
+      (errmess) => {
+        this.feedback = null;
+        // tslint:disable-next-line: no-angle-bracket-type-assertion
+        this.errMess = <any>errmess;
+      }
+    );
   }
 }

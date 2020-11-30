@@ -33,6 +33,7 @@ import { ContactComponent } from './contact/contact.component';
 import { DishService } from './services/dish.service';
 import { PromotionService } from './services/promotion.service';
 import { LeaderService } from './services/leader.service';
+import { FeedbackService } from './services/feedback.service';
 // 1. Importar servicio
 import { ProcessHttpMsgService } from './services/process-http-msg.service';
 
@@ -41,6 +42,7 @@ import { LoginComponent } from './login/login.component';
 
 import { baseURL } from './shared/baseurl';
 import { HighlightDirective } from './directives/highlight.directive';
+import { from } from 'rxjs';
 
 @NgModule({
   // tslint:disable-next-line: max-line-length
@@ -84,6 +86,7 @@ import { HighlightDirective } from './directives/highlight.directive';
     DishService,
     PromotionService,
     LeaderService,
+    FeedbackService,
     ProcessHttpMsgService,
     { provide: 'BaseURL', useValue: baseURL },
   ],
