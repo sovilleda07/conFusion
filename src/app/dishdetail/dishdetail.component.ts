@@ -6,11 +6,27 @@ import { DishService } from '../services/dish.service';
 import { switchMap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Comment } from '../shared/comment';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 
+// Añadir los activadores de animación en el decorador de componentes
 @Component({
   selector: 'app-dishdetail',
   templateUrl: './dishdetail.component.html',
   styleUrls: ['./dishdetail.component.scss'],
+  animations: [
+    // Definir disparador
+    trigger('visibility', [
+      state('shown', style({
+          transform: 'scale(1.0)',
+          opacity: 1
+      })),
+      state('hidden', style({
+          transform: 'scale(0.5)',
+          opacity: 0
+      })),
+      transition('* => *', animate('0.5s ease-in-out'))
+  ])
+  ]
 })
 export class DishdetailComponent implements OnInit {
   dish: Dish;
@@ -18,11 +34,12 @@ export class DishdetailComponent implements OnInit {
   dishIds: string[];
   prev: string;
   next: string;
-
   commentForm: FormGroup;
   comment: Comment;
-  // 1. Nueva variable que contiene la copia del Dish modificado hasta que se publique en el servidor.
   dishcopy: Dish;
+
+  // Configurar visibilidad inicialmente como "Shown"
+  visibility = 'shown';
 
   formErrors = {
     author: '',
@@ -48,7 +65,13 @@ export class DishdetailComponent implements OnInit {
     private fb: FormBuilder,
     @Inject('BaseURL') public BaseURL
   ) {}
-
+  /* Esto sucede cada vez que se está cambiando entre platos
+  Cuando comience a buscar el nuevo plato tras el cambio de los parámetros de ruta,
+  se establecerá la visibilidad como 'Hidden' para que ese plato actual que se está
+  mostrando en la vista, se oculte.
+  Y entonces cuando el nuevo plato esté disponible (eso sucederá cuando se llame la suscripción cuando ese observable esté disponible)
+  Y luego, cuando el plato esté disponible y luego, se coloca y se restaura la visibilidad a 'shown'.
+  */
   ngOnInit(): void {
     this.createForm();
     this.dishService
@@ -57,14 +80,14 @@ export class DishdetailComponent implements OnInit {
     this.route.params
       .pipe(
         // tslint:disable-next-line: no-string-literal
-        switchMap((params: Params) => this.dishService.getDish(params['id']))
+        switchMap((params: Params) => { this.visibility = 'hidden'; return this.dishService.getDish(params['id']); })
       )
       .subscribe(
         (dish) => {
           this.dish = dish;
-          // 2. Creamos la copia del platillo
           this.dishcopy = dish;
           this.setPrevNext(dish.id);
+          this.visibility = 'shown';
         },
         // tslint:disable-next-line: no-angle-bracket-type-assertion
         (errmess) => (this.errMess = <any> errmess)
@@ -109,20 +132,13 @@ export class DishdetailComponent implements OnInit {
   onSubmit(): void {
     this.comment = this.commentForm.value;
     this.comment.date = new Date().toISOString();
-    // 3. Empujaremos el comentario a la copia de dish.
-    // Para primero modificar el objeto DishCopy, y luego publicar eso en el servidor.
-    // Cuando el servidor responda con la información del plato modificada, entonces se mostrará en el cliente.
-    // Llamamos al método envíandole "dishcopy", la versión modificada
-    // Cuando recibamos la respuesta del servidor, manejaremos el plato entrante
     this.dishcopy.comments.push(this.comment);
     this.dishService.putDish(this.dishcopy).subscribe(
       (dish) => {
-        // Igualamos el platillo actual al que viene del servidor.
         this.dish = dish;
         this.dishcopy = dish;
       },
       (errmess) => {
-        // Si hay algún problema, las variables que almacenan los platillo convertimos su valor a null
         this.dish = null;
         this.dishcopy = null;
         // tslint:disable-next-line: no-angle-bracket-type-assertion
